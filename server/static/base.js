@@ -37,66 +37,151 @@ $(document).ready(function() {
     updater.start();
 
     transitioner.start();
+    transitioner.add_listeners();
 
     // add listener for view toggle
     $('#view-toggler').click(function (e) {
-        $('body').toggleClass('dashboard-fullscreen');
+        if (!$('body').hasClass('dashboard-fullscreen')) {
+            $('body').addClass('dashboard-fullscreen');
 
-        if ($('body').hasClass('dashboard-fullscreen')) {
             transitioner.start();
+            transitioner.add_listeners();
         } else {
             transitioner.stop();
+            transitioner.remove_listeners();
+
+            $('body').removeClass('dashboard-fullscreen');
+
+            // show all plugins
+            $('div.plugin').show();
         }
-
     });
-
 });
 
 // Plugin transitioner
 var transitioner = {
     config: {
         tdelay: 10000,  // delay between transitions
-        edelay: 1000,   // effect delay
+        edelay: 1000,   // effect delay (cannot be more than tdelay!)
         interval: 0,
-        timeout: 0
+        paused: 0,
+        firstplugin: null,
+        lastplugin: null,
+        toshow: null // plugin to show
     },
 
     start: function() {
+        var obj = this;
+
         // hide all plugins
         $('.dashboard-fullscreen div.plugin').hide();
-        var obj = this;
-        var firstplugin = $('.dashboard-fullscreen div.plugin:first');
-        // start transitioning immediately
-        obj.plugin_transition(firstplugin);
-        // continue on interval
-        tinterval = $('div.plugin').length * (obj.config.tdelay + obj.config.edelay);
-        this.config.interval = setInterval(function() {obj.plugin_transition(firstplugin);}, tinterval);
+
+        obj.config.firstplugin = $('.dashboard-fullscreen div.plugin:first');
+        obj.config.lastplugin = $('.dashboard-fullscreen div.plugin:last');
+
+        // show the first plugin immediately
+        obj.config.firstplugin.fadeIn(obj.config.edelay);
+
+        // resume on interval (if more than one plugin)
+        if (obj.config.firstplugin.next().length) {
+            obj.config.toshow = obj.config.firstplugin.next();
+            obj.resume();
+        } else {
+            obj.config.toshow = obj.config.firstplugin;
+        }
     },
 
-    plugin_transition: function(plugin) {
-        $('.dashboard-fullscreen div.plugin').hide();
+    add_listeners: function() {
         var obj = this;
-        var nextplugin = plugin.next();
-        if (nextplugin.length) {
-            plugin.fadeIn(obj.config.edelay);
 
-            obj.config.timeout = setTimeout(function () {
-                plugin.fadeOut(obj.config.edelay, function() {obj.plugin_transition(nextplugin)});
-            }, obj.config.tdelay);
+        // add keyboard listeners
+        $('body.dashboard-fullscreen').keydown(function (e) {
+            if (e.which == 32) {  // spacebar for pause
+                obj.config.paused = !obj.config.paused;
+                if (obj.config.paused) {
+                    obj.stop();
+                } else {
+                    obj.resume();
+                }
+            } else if (e.which == 39) {  // rigth arrow
+                //  stop transitioner temporarily
+                obj.stop();
+
+                // call transition manually
+                obj.plugin_transition();
+
+                // resume transitioner
+                obj.resume();
+            } else if (e.which == 37) {  // left arrow
+                //  stop transitioner temporarily
+                obj.stop();
+
+                // call transition manually
+                obj.config.toshow = obj.get_prev();
+                obj.plugin_transition();
+
+                // resume transitioner
+                obj.resume();
+            }
+        });
+    },
+
+    remove_listeners: function() {
+        $('body.dashboard-fullscreen').off('keydown');
+    },
+
+    // show the current plugin and set next one to show
+    plugin_transition: function() {
+        var obj = this;
+
+        // hide all plugins
+        $('.dashboard-fullscreen div.plugin').hide();
+
+        // show current plugin
+        obj.config.toshow.fadeIn(obj.config.edelay);
+
+        // set next plugin to show
+        obj.config.toshow = obj.get_next();
+    },
+
+    get_next: function() {
+        var next = this.config.toshow.next();
+
+        if (next.length) {
+            return next;
         } else {
-            plugin.fadeIn(obj.config.edelay);
+            // wrap around :D
+            return this.config.firstplugin;
+        }
+    },
+
+    get_prev: function() {
+        var prev = this.config.toshow.prev().prev();  // we need to go back 2 as toshow is the next one
+
+        if (prev.length) {
+            return prev;
+        } else if (this.config.toshow == this.config.firstplugin) {
+            // little hack to get wrapping to work
+            return this.config.lastplugin.prev();
+        } else {
+            // wrap around :D
+            return this.config.lastplugin;
         }
     },
 
     stop: function() {
-        // show all plugins
-        $('div.plugin').show();
-
-        // remove timeout event
-        clearTimeout(this.config.timeout);
-
         // remove the transitioning interval
         clearInterval(this.config.interval);
+    },
+
+    resume: function() {
+        var obj = this;
+
+        // add new interval (if more than one plugin)
+        if (obj.config.firstplugin.next().length) {
+            tinterval = obj.config.tdelay + obj.config.edelay;
+            this.config.interval = setInterval(function() {obj.plugin_transition();}, obj.config.tdelay);
+        }
     }
 }
 
