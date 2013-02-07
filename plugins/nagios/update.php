@@ -5,6 +5,13 @@ require_once(dirname(__FILE__).'/config.php');
 
 // Last dataset hash
 $lasthash = '';
+$lastcodes = array();
+$laststates = array();
+
+define('STATE_OK',          'OK');
+define('STATE_WARNING',     'Warning');
+define('STATE_UNKNOWN',     'Unknown');
+define('STATE_CRITICAL',    'Critical');
 
 while (1) {
 
@@ -20,7 +27,7 @@ while (1) {
         $group = array();
         $state = 0;
 
-        $types = array('OK', 'Warning', 'Unknown', 'Critical');
+        $types = array(STATE_OK, STATE_WARNING, STATE_UNKNOWN, STATE_CRITICAL);
 
         foreach ($data as $i => $row) {
             $group[$types[$i]] = $row;
@@ -30,11 +37,25 @@ while (1) {
             }
         }
 
+        // If no data supplied, critical
+        if (!count($data)) {
+            $state = STATE_CRITICAL;
+        } else {
+            $state = $types[$state];
+        }
+
+        // Check when state last changed
+        if (!in_array($name, array_keys($laststates)) || $laststates[$name][0] !== $state) {
+            $timechanged = time();
+        } else {
+            $timechanged = $laststates[$name][1];
+        }
+
+        $states[$name] = array($state, $timechanged);
         $codes[$name] = $group;
-        $states[$name] = $types[$state];
     }
 
-    $newhash = serialize($codes);
+    $newhash = md5(serialize($codes) . serialize($states));
 
     if ($newhash != $lasthash) {
         print "Update sent\n";
@@ -42,6 +63,8 @@ while (1) {
     }
 
     $lasthash = $newhash;
+    $lastcodes = $codes;
+    $laststates = $states;
 
-    sleep(60);
+    sleep(30);
 }
