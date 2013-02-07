@@ -36,15 +36,12 @@ $(document).ready(function() {
 
     updater.start();
 
-    transitioner.start();
-    transitioner.add_listeners();
-
     // add listener for view toggle
     $('#view-toggler').click(function (e) {
         if (!$('body').hasClass('dashboard-fullscreen')) {
             $('body').addClass('dashboard-fullscreen');
 
-            transitioner.start();
+            transitioner.init();
             transitioner.add_listeners();
         } else {
             transitioner.stop();
@@ -70,7 +67,7 @@ var transitioner = {
         toshow: null // plugin to show
     },
 
-    start: function() {
+    init: function() {
         var obj = this;
 
         // hide all plugins
@@ -82,10 +79,10 @@ var transitioner = {
         // show the first plugin immediately
         obj.config.firstplugin.fadeIn(obj.config.edelay);
 
-        // resume on interval (if more than one plugin)
+        // start on interval (if more than one plugin)
         if (obj.config.firstplugin.next().length) {
             obj.config.toshow = obj.config.firstplugin.next();
-            obj.resume();
+            obj.start();
         } else {
             obj.config.toshow = obj.config.firstplugin;
         }
@@ -100,18 +97,27 @@ var transitioner = {
                 obj.config.paused = !obj.config.paused;
                 if (obj.config.paused) {
                     obj.stop();
+                    $('.footer-center').append('<p id="transitioner-paused-indicator">Paused</p>');
+                    $('#transitioner-paused-indicator').effect("pulsate", { times:77 }, 77777);
                 } else {
-                    obj.resume();
+                    $('#transitioner-paused-indicator').remove();
+                    obj.start();
                 }
-            } else if (e.which == 39) {  // rigth arrow
+            } else {
+                // any other keypress should unpause
+                $('#transitioner-paused-indicator').remove();
+                obj.config.paused = 0;
+            }
+
+            if (e.which == 39) {  // rigth arrow
                 //  stop transitioner temporarily
                 obj.stop();
 
                 // call transition manually
                 obj.plugin_transition();
 
-                // resume transitioner
-                obj.resume();
+                // start transitioner
+                obj.start();
             } else if (e.which == 37) {  // left arrow
                 //  stop transitioner temporarily
                 obj.stop();
@@ -120,8 +126,8 @@ var transitioner = {
                 obj.config.toshow = obj.get_prev();
                 obj.plugin_transition();
 
-                // resume transitioner
-                obj.resume();
+                // start transitioner
+                obj.start();
             }
         });
     },
@@ -170,17 +176,20 @@ var transitioner = {
     },
 
     stop: function() {
+        var obj = this;
+
         // remove the transitioning interval
-        clearInterval(this.config.interval);
+        clearInterval(obj.config.interval);
+        obj.config.interval = 0;
     },
 
-    resume: function() {
+    start: function() {
         var obj = this;
 
         // add new interval (if more than one plugin)
         if (obj.config.firstplugin.next().length) {
             tinterval = obj.config.tdelay + obj.config.edelay;
-            this.config.interval = setInterval(function() {obj.plugin_transition();}, obj.config.tdelay);
+            obj.config.interval = setInterval(function() {obj.plugin_transition();}, obj.config.tdelay);
         }
     }
 }
