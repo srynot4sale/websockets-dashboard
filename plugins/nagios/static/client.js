@@ -6,14 +6,7 @@ plugins.nagios = {
         html = ('<div class="plugin" id="nagios"><h1>Server States</h1><div class="lastchange"></div></div>');
         $('div#body').append(html);
 
-        $.getScript(
-            base_url + '/plugin/nagios/jquery.timeago.js',
-            function() {
-                jQuery(document).ready(function() {
-                    jQuery("abbr.timeago").timeago({suffixAgo: ''});
-                });
-            }
-        );
+        $.getScript(base_url + '/plugin/nagios/jquery.timeago.js');
     },
 
     receiveData: function(data) {
@@ -44,7 +37,7 @@ plugins.nagios = {
 
             var group = $('div#'+title, container);
             if (!group.length) {
-                var group = $('<div id="'+title+'"><h2>'+title+'<abbr class="timeago"></abbr></h2><ul></ul></div>');
+                var group = $('<div id="'+title+'"><h2>'+title+'</h2><ul></ul></div>');
                 $('h1', container).after(group);
             }
 
@@ -59,10 +52,17 @@ plugins.nagios = {
             $('h2', group).attr('class', data['states'][c][0]);
 
             // Set date state last changed
+            // Build date object
             var lc = new Date();
             lc.setTime(data['states'][c][1] * 1000);
-            $('h2 abbr', group).attr('title', lc.toISOString());
-            jQuery("abbr.timeago").timeago({suffixAgo: ''});
+
+            // Delete old abbr tag (timeago plugin doesn't like the time changing)
+            $('h2 abbr', group).remove();
+
+            // Create new one
+            var abbr = $('<abbr class="timeago"></abbr>').attr('title', lc.toISOString());
+            $('h2', group).append(abbr);
+            abbr.timeago();
         }
     }
 }
