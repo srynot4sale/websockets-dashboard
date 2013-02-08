@@ -151,10 +151,22 @@ p.footer-left {
     float: right;
 }
 
+.footer-center {
+    width: 25%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
 #view-toggler {
     margin-left: 10px;
     width: 16px;
     height: 16px;
+}
+
+#transitioner-paused-indicator {
+    color: red;
+    font-weight: bold;
 }
 
 div.error {
