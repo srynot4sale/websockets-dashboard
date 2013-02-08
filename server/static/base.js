@@ -93,7 +93,7 @@ var transitioner = {
 
         // add keyboard listeners
         $('body.dashboard-fullscreen').keydown(function (e) {
-            if (e.which == 32) {  // spacebar for pause
+            if (e.which == 40) {  // down arrow for pause
                 obj.config.paused = !obj.config.paused;
                 if (obj.config.paused) {
                     obj.stop();
@@ -103,6 +103,7 @@ var transitioner = {
                     $('#transitioner-paused-indicator').remove();
                     obj.start();
                 }
+                return false;  // prevent repainting that might happen
             } else {
                 // any other keypress should unpause
                 $('#transitioner-paused-indicator').remove();
