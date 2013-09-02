@@ -3,10 +3,32 @@ plugins.nagios = {
     html: null,
 
     start: function() {
-        html = ('<div class="plugin" id="nagios"><h1>Server States</h1><div class="lastchange"></div></div>');
+        html = ('<div class="plugin" id="nagios"> \
+                <h1>Server States</h1> \
+                <div class="lastchange"></div> \
+                <audio id="audio-critical" src="/plugin/nagios/gong.mp3" type="audio/mpeg" controls></audio> \
+                </div>');
         $('div#body').append(html);
 
         $.getScript(base_url + '/plugin/nagios/jquery.timeago.js');
+
+        // Produce audio alert when a cluster goes critical (red)
+        $('#audio-critical').hide();
+        var notified = 0;
+        window.setInterval(function () {
+                var brokencount = $('#nagios h2.Critical').length;
+                if (brokencount > 0) {
+                    if (brokencount > notified) {
+                        console.log('Critical server!');
+                        $('#audio-critical')[0].load();  // required for replays
+                        $('#audio-critical')[0].play();
+                    }
+                    notified = brokencount;
+                } else {
+                    notified = 0;  // reset the notification
+                }
+            }, 1000);
+
     },
 
     receiveData: function(data) {
