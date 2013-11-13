@@ -91,6 +91,7 @@ plugins.nagios = {
 
             // Create new one
             var abbr = $('<abbr class="timeago"></abbr>').attr('title', lc.toISOString());
+            $('h2', group).attr('title', lc.toDateString()+' '+lc.toTimeString());
             $('h2', group).append(abbr);
             abbr.timeago();
         }
