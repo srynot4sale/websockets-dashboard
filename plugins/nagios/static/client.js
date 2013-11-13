@@ -22,6 +22,14 @@ plugins.nagios = {
                         console.log('Critical server!');
                         $('#audio-critical')[0].load();  // required for replays
                         $('#audio-critical')[0].play();
+
+                        if ($('.dashboard-fullscreen').length) {
+                            transitioner.stop();
+                            transitioner.config.toshow = $('.dashboard-fullscreen #nagios');
+                            transitioner.plugin_transition();
+
+                            transitioner.start();
+                        }
                     }
                     notified = brokencount;
                 } else {
