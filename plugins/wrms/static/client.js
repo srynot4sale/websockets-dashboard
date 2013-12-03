@@ -29,7 +29,7 @@ plugins.wrms = {
             var id = 'wr-'+content.request_id;
 
             var d = new Date();
-            d.setTime(content.last_activity_epoch * 1000);
+            d.setTime(content.last_activity_epoch_canonical * 1000);
 
             var c = '';
             if (content.ranking > 10000) {
