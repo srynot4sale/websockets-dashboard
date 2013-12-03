@@ -33,7 +33,7 @@ $reports = array(
     '&last_status=L&order_by=ranking&order_direction=desc'
 );
 
-// Wait 1-10 seconds then send random WR data
+// Wait 1-10 seconds then send WR data
 while(1) {
 
     print "API call\n";
