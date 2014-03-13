@@ -15,7 +15,8 @@ $cols = array(
     'system_code',
     'status_desc',
     'brief',
-    'ranking'
+    'ranking',
+    'allocated_to_ids'
 );
 
 // Base url
@@ -63,6 +64,16 @@ while(1) {
             if (!empty($config->ignore_orgs)) {
                 if (in_array($row->organisation_code, $config->ignore_orgs)) {
                     continue;
+                }
+            }
+
+            // Check if ignored allocated user
+            if (!empty($config->ignore_allocateds)) {
+                $row->allocated_to_ids = explode(', ', $row->allocated_to_ids);
+                if (count($row->allocated_to_ids) == 1) {
+                    if (in_array($row->allocated_to_ids[0], $config->ignore_allocateds)) {
+                        continue;
+                    }
                 }
             }
 
