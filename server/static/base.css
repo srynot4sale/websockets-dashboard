@@ -173,8 +173,8 @@ div.error {
     top: 0;
     color: red;
     background-color: #000;
-    position: absolute;
     text-align: center;
     width: 100%;
     padding: 20px 0;
+    font-size: 200%;
 }
