@@ -29,7 +29,7 @@ plugins.wrms = {
             var id = 'wr-'+content.request_id;
 
             var d = new Date();
-            d.setTime(content.last_activity_epoch * 1000);
+            d.setTime(content.last_activity_epoch_canonical * 1000);
 
             var c = '';
             if (content.ranking > 10000) {
@@ -44,9 +44,17 @@ plugins.wrms = {
 
             var link = $('<a>').html('<em>['+content.organisation_code+']</em> '+content.brief);
             link.attr('href', content.request_url);
-            var status = '<span class="status">'+content.status_desc+'</span> [WR#'+content.request_id+'] Last changed: '+d.toDateString();
+            var status = '<span class="status">'+content.status_desc+'</span> [WR#'+content.request_id+'] ';
+
+            // Setup date
+            var lastchanged = $('<span>Last changed: </span>').attr('title', d.toDateString()+' '+d.toTimeString());
+            var abbr = $('<abbr class="timeago"></abbr>').attr('title', d.toISOString());
+            if (abbr.timeago) {
+                abbr.timeago();
+            }
+
             var node = $('<li>').attr('id', id).attr('class', c).data('date', content.last_activity_epoch);
-            node.append(link).append(' - ').append(status);
+            node.append(link).append(' - ').append(status).append(lastchanged).append(abbr);
 
             node.hide();
 
