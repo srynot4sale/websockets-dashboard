@@ -47,6 +47,7 @@ while(1) {
         $ch = curl_init($url.$report);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
         curl_setopt($ch, CURLOPT_COOKIE, 'wrms3_auth='.$config->secret);
+        curl_setopt($ch, CURLOPT_USERAGENT, "websockets-dashboard");
         $result = curl_exec($ch);
         curl_close($ch);
 
