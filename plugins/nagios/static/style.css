@@ -1,9 +1,13 @@
+div#nagios {
+  overflow: auto;
+}
+
 div#nagios h2 {
     background-color: #666;
     padding: 0.5em 1em;
     margin: 0.5em 0 0;
     color: #fff;
-    text-shadow: 0 0 2px #000;
+    text-shadow: 0 0 0.3em #000;
 }
 
 div#nagios h2.OK {
@@ -15,7 +19,7 @@ div#nagios h2.Critical {
 }
 
 div#nagios h2.Warning {
-    background-color: #ff0;
+    background-color: #f90;
 }
 
 div#nagios h2.Unknown {
@@ -58,10 +62,48 @@ div#nagios div.lastchange {
     padding: 0.25em 0;
 }
 
+div#nagios table.status {
+    margin: 1em 0;
+    font-size: 150%;
+    color: #D3D4D4;
+}
+
+/**
+div#nagios table.status img {
+    display: none;
+}
+**/
+
+div#nagios table.status > tr > td:nth-child(1) {
+    padding-left: 1em;
+}
+
+div#nagios table.status tr td:nth-child(3) {
+    text-align: right;
+    padding-right: 1em;
+}
+
+div#nagios table.status tr th,
+div#nagios table.status tr td:nth-child(4),
+div#nagios table.status tr td:nth-child(5),
+div#nagios table.status tr td:nth-child(6),
+div#nagios table.status tr td:nth-child(7),
+div#nagios table.status tr td:nth-child(8) {
+    display: none;
+}
+
+div#nagios div.itemTotalsTitle {
+  display: none;
+}
+
 body.dashboard-fullscreen div#nagios h2 {
     font-size: 250%;
 }
 
 body.dashboard-fullscreen div#nagios ul li {
     font-size: 120%;
+}
+
+body.dashboard-fullscreen div#nagios table.status {
+    font-size: 250%;
 }

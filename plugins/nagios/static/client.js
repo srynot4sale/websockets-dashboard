@@ -64,6 +64,7 @@ plugins.nagios = {
 
             var title = c;
             var codes = data['groups'][c];
+            var markups = data['markup'][c];
 
             var group = $('div#'+title, container);
             if (!group.length) {
@@ -73,9 +74,14 @@ plugins.nagios = {
 
             var codelist = $('ul', group);
             codelist.html('');
-            for (cd in codes) {
+/**            for (cd in codes) {
                 var code = codes[cd];
                 codelist.append($('<li>'+cd+': '+code+'</li>'));
+            } **/
+            if (markups) {
+                for (markup in markups) {
+                    codelist.append(markups[markup]);
+                }
             }
 
             // Set state
