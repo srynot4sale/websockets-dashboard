@@ -1,0 +1,86 @@
+div#jenkins li.urgent a {
+    color: #f00;
+}
+
+.dashboard-fullscreen div#jenkins {
+    font-size: 32px;
+}
+
+div#jenkins h1 span.queue {
+    margin-left: 2em;
+    display: inline-block;
+    color: #fff;
+}
+
+.dashboard-fullscreen div#jenkins > ol > li {
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+div#jenkins li.new span.status {
+    color: #f90;
+}
+
+div#jenkins li {
+    padding: 2px 0;
+    border-bottom: 1px solid #999;
+    overflow: auto;
+    font-size: 110%;
+    margin-bottom: 1px;
+}
+
+div#jenkins li a {
+    color: #fff;
+    padding: 3px 0;
+    display: inline-block;
+/**    text-shadow: 0 0 0.1em #fff; **/
+}
+
+div#jenkins li span.duration {
+    float: right;
+    background-color: #fff;
+    color: #333;
+    padding: 5px;
+    width: 20%;
+    text-align: center;
+}
+/**
+div#jenkins li.status-RUNNING {
+    border: 3px solid #fff;
+}
+
+div#jenkins li.status-ABORTED {
+    background-color: #666;
+}
+
+div#jenkins li.status-FAILURE {
+    background-color: #f00;
+}
+
+div#jenkins li.status-SUCCESS {
+    background-color: #0f0;
+}
+
+div#jenkins li.status-SUCCESS a {
+    color: #333;
+    text-shadow: none;
+}
+**/
+
+div#jenkins li.status-RUNNING {
+/**    border: 3px solid #666;**/
+}
+
+div#jenkins li.status-ABORTED span.duration {
+    background-color: #666;
+    color: #fff;
+}
+
+div#jenkins li.status-FAILURE span.duration {
+    background-color: #f00;
+    color: #fff;
+}
+
+div#jenkins li.status-SUCCESS span.duration {
+    background-color: #0f0;
+}
