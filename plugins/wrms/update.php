@@ -85,6 +85,12 @@ while(1) {
             if (!isset($lastwrs[$seen]) || $row != $lastwrs[$seen]) {
                 // Update $lastwrs and trigger sending of new version
                 $send = true;
+                foreach ($row as $key => $val) {
+                    if (is_string($val)) {
+                        // escape any nasties
+                        $row->{$key} = htmlspecialchars($val, ENT_QUOTES | ENT_SUBSTITUTE);
+                    }
+                }
                 $lastwrs[$seen] = $row;
             }
 
