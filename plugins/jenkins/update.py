@@ -39,15 +39,35 @@ def dashboard_push_data(plugin, data, multiple = False):
     if multiple:
         d.append(('multiple', 1))
         for item in data:
+            # escape any nasties
+            for i,t in item.iteritems():
+                item[i] = html_escape(t)
             j = json.dumps(item)
             d.append(('data', j))
     else:
+        # escape any nasties
+        for i,t in data.iteritems():
+            data[i] = html_escape(t)
         j = json.dumps(data)
         d.append(('data', j))
 
     r = requests.post('http://%s/update/%s?%s' % (CONFIG['host'], plugin, urllib.urlencode(d)))
 
 
+def html_escape(text):
+    if not isinstance(text, basestring):
+        # Not a string
+        return text
+
+    html_escape_table = {
+        "&": "&amp;",
+        '"': "&quot;",
+        "'": "&apos;",
+        ">": "&gt;",
+        "<": "&lt;",
+    }
+
+    return "".join(html_escape_table.get(c,c) for c in text)
 
 # Main code
 def main():
