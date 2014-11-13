@@ -16,7 +16,7 @@ plugins.nagios = {
         $('#audio-critical').hide();
         var notified = 0;
         window.setInterval(function () {
-                var brokencount = $('#nagios h2.Critical').length;
+                var brokencount = $('#nagios h2.critical').length;
                 if (brokencount > 0) {
                     if (brokencount > notified) {
                         console.log('Critical server!');
@@ -52,7 +52,7 @@ plugins.nagios = {
         // Only care about the newest message
         data = data.pop();
 
-        // Last change
+        // Update last change time
         var lastchange = $('div.lastchange', container);
         if (data['lastchange']) {
             var c = new Date();
@@ -60,46 +60,65 @@ plugins.nagios = {
             lastchange.html('Last change: '+c.toDateString()+' '+c.toTimeString());
         }
 
+        // Loop through each "group" (nagios hostgroup)
         for (c in data['groups']) {
 
             var title = c;
             var codes = data['groups'][c];
-            var markups = data['markup'][c];
 
+            // Add if not already in list
             var group = $('div#'+title, container);
             if (!group.length) {
                 var group = $('<div id="'+title+'"><h2>'+title+'</h2><ul></ul></div>');
                 $('h1', container).after(group);
             }
 
+            // Loop through checks reporting non-success status
             var codelist = $('ul', group);
             codelist.html('');
-/**            for (cd in codes) {
-                var code = codes[cd];
-                codelist.append($('<li>'+cd+': '+code+'</li>'));
-            } **/
-            if (markups) {
-                for (markup in markups) {
-                    codelist.append(markups[markup]);
+            for (cstate in codes) {
+                var checks = codes[cstate];
+                for (cc in checks) {
+                    cc = checks[cc];
+
+                    var c_meta = $('<span>').addClass('meta');
+
+                    if (cc['downtimed']) {
+                        c_meta.html('DOWNTIMED');
+                    } else {
+                        c_meta.html(cc['duration']);
+                    }
+
+                    var c_state = $('<span>').addClass('state').attr('title', cstate).html('&#9679;');
+                    var c_li = $('<li>').addClass(cstate);
+
+                    c_li.html('['+cc['server']+'] '+cc['service']);
+                    c_li.prepend(c_state);
+                    c_li.prepend(c_meta);
+
+                    codelist.append(c_li);
                 }
             }
 
-            // Set state
-            $('h2', group).attr('class', data['states'][c][0]);
+            // Set state of group
+            group.find('h2').attr('class', data['states'][c][0]);
 
             // Set date state last changed
-            // Build date object
+
+            // First, build data object
             var lc = new Date();
             lc.setTime(data['states'][c][1] * 1000);
 
-            // Delete old abbr tag (timeago plugin doesn't like the time changing)
-            $('h2 abbr', group).remove();
+            // Create new abbr and replace old (timeago plugin doesn't like the time changing)
+            var abbr = $('<abbr class="timeago"></abbr>').attr('title', lc.toISOString()).timeago();
+            group.find('h2').attr('title', lc.toDateString()+' '+lc.toTimeString());
 
-            // Create new one
-            var abbr = $('<abbr class="timeago"></abbr>').attr('title', lc.toISOString());
-            $('h2', group).attr('title', lc.toDateString()+' '+lc.toTimeString());
-            $('h2', group).append(abbr);
-            abbr.timeago();
+            // Replace, or add new
+            if (group.find('h2 abbr').length) {
+                group.find('h2 abbr').replaceWith(abbr);
+            } else {
+                group.find('h2').append(abbr);
+            }
         }
     }
 }

@@ -6,20 +6,36 @@ div#nagios h2 {
     text-shadow: 0 0 0.3em #000;
 }
 
-div#nagios h2.OK {
+div#nagios h2.ok {
     background-color: #62aa2d;
 }
 
-div#nagios h2.Critical {
+div#nagios ul li.ok span.state {
+    color: #62aa2d;
+}
+
+div#nagios h2.critical {
     background-color: #f00;
 }
 
-div#nagios h2.Warning {
+div#nagios ul li.critical span.state {
+    color: #f00;
+}
+
+div#nagios h2.warning {
     background-color: #f90;
 }
 
-div#nagios h2.Unknown {
+div#nagios ul li.warning span.state {
+    color: #f90;
+}
+
+div#nagios h2.unknown {
     background-color: #ff8c00;
+}
+
+div#nagios ul li.unknown span.state {
+    color: #ff8c00;
 }
 
 div#nagios h2 abbr {
@@ -28,8 +44,9 @@ div#nagios h2 abbr {
 }
 
 div#nagios ul {
-    padding: 0 0 0 1em;
+    padding: 1em;
     margin: 0;
+    list-style: none;
 }
 
 div#nagios div {
@@ -38,14 +55,18 @@ div#nagios div {
 }
 
 div#nagios ul li {
-    display: block;
-    width: 18%;
-    padding: 2% 2%;
+    margin: 0;
     color: #fff;
-    font-weight: bold;
-    background-color: #666;
-    margin: 1em 1em 1em 0;
-    float: left;
+    font-size: 150%;
+}
+
+div#nagios ul li span.state {
+    display: inline-block;
+    margin-right: 0.5em;
+}
+
+div#nagios ul li span.meta {
+    float: right;
 }
 
 div#nagios div.lastchange {
@@ -97,7 +118,7 @@ body.dashboard-fullscreen div#nagios h2 {
 }
 
 body.dashboard-fullscreen div#nagios ul li {
-    font-size: 120%;
+    font-size: 250%;
 }
 
 body.dashboard-fullscreen div#nagios table.status {
