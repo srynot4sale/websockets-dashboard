@@ -42,7 +42,7 @@ plugins.wrms = {
 
             var find = $('li#'+id, container);
 
-            var link = $('<a>').html('<em>['+content.organisation_code+']</em> '+content.brief);
+            var link = $('<a target="_blank">').html('<em>['+content.organisation_code+']</em> '+content.brief);
             link.attr('href', content.request_url);
             var status = '<span class="status">'+content.status_desc+'</span> [WR#'+content.request_id+'] ';
 
