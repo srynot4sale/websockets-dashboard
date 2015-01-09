@@ -14,8 +14,13 @@ Then visit http://127.0.0.1:8888/ in your browser to view.
 
 ## Plugins
 
-This is done on a per-plugin basis as they all work differently.
+You need to enable at least one plugin. Do this by symlinking the plugins you want from plugins to enabledplugins
 
+ ln -s /full/pathto/plugin/myplugin /full/pathto/enabledplugins/myplugin
+
+* restart your python server
+
+You've now got a plugin receiver running.  You need to run the plugin to poke information into the receiver.  See below.
 
 # Plugin interfaces:
 
