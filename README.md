@@ -1,6 +1,7 @@
 # Prerequisites
 
 * Tornado (http://www.tornadoweb.org) is installed - this can by done via easy_install
+ sudo easy_install tornado
 
 # To run
 
