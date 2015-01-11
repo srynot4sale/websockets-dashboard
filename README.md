@@ -14,9 +14,9 @@ Then visit http://127.0.0.1:8888/ in your browser to view.
 
 ## Plugins
 
-You need to enable at least one plugin. Do this by symlinking the plugins you want from plugins to enabledplugins
+You need to enable at least one plugin. Do this by symlinking the plugins you want from plugins to enabled-plugins
 
- ln -s /full/pathto/plugin/myplugin /full/pathto/enabledplugins/myplugin
+ ln -s /full/pathto/plugin/myplugin /full/pathto/enabled-plugins/myplugin
 
 * restart your python server
 
