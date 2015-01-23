@@ -1,13 +1,12 @@
-import ConfigParser
-import json
-import logging
 import os
+import urllib2
 import requests
+import json
 import time
-import urllib
+import ConfigParser
+import logging
+import datetime
 
-import jenkinsapi
-from jenkinsapi.jenkins import Jenkins
 
 CONFIG = {}
 
@@ -28,30 +27,18 @@ def setup_config():
     con = ConfigParser.ConfigParser()
     con.readfp(open(path))
 
-    CONFIG['jenkins'] = con.get('jenkins', 'host')
+    CONFIG['apiurl'] = con.get('jenkins', 'apiurl')
+    CONFIG['buildcount'] = int(con.get('general', 'buildcount'))
 
 
 # Generic push to dashboard function
-def dashboard_push_data(plugin, data, multiple = False):
+def dashboard_push_data(plugin, data):
     global CONFIG
 
-    d = []
-    if multiple:
-        d.append(('multiple', 1))
-        for item in data:
-            # escape any nasties
-            for i,t in item.iteritems():
-                item[i] = html_escape(t)
-            j = json.dumps(item)
-            d.append(('data', j))
-    else:
-        # escape any nasties
-        for i,t in data.iteritems():
-            data[i] = html_escape(t)
-        j = json.dumps(data)
-        d.append(('data', j))
-
-    r = requests.post('http://%s/update/%s?%s' % (CONFIG['host'], plugin, urllib.urlencode(d)))
+    data = [('data', json.dumps(data))]
+    print "push!"
+    print data
+    r = requests.post('http://%s/update/%s' % (CONFIG['host'], plugin), data=data)
 
 
 def html_escape(text):
@@ -69,83 +56,49 @@ def html_escape(text):
 
     return "".join(html_escape_table.get(c,c) for c in text)
 
-# Main code
+
 def main():
     global CONFIG
     setup_config()
 
-    server = Jenkins(CONFIG['jenkins'])
+    url = CONFIG['apiurl']
 
-    #print(dir(j['moodle']))
-
-    jobs = ['moodle', 'totara']
-
-    # Run forever
     while 1:
-
         try:
-            queueitems = []
-            for jobname in jobs:
-                job = server[jobname]
+            response = json.load(urllib2.urlopen(url))
 
-                # Get queue length
-                if job.is_queued():
-                    q = server.get_queue()
-                    queue = q.get_queue_items_for_job(jobname)
-                    for qitem in queue:
-                        queueitems.append(qitem.params.replace('\nBRANCH=', ''))
+            jobs = {}
+            queue = []
+            for job in response['jobs']:
+                if job['inQueue']:
+                    queue.append(job['name'])
 
-            queue = len(queueitems)
-            print('Queue length: %d' % queue)
-            if queue:
-                print('Queue: %s' % queueitems)
+                if not job['lastBuild']:
+                    continue
 
-            builddata = []
-            for jobname in jobs:
-                job = server[jobname]
+                latestbuild = job['lastBuild']
+                duration = 0
+                if latestbuild['duration']:
+                    duration = str(datetime.timedelta(seconds=int(latestbuild['duration']/1000)))
+                jobs[latestbuild['timestamp']] = {
+                    'id': latestbuild['fullDisplayName'],
+                    'timestamp': latestbuild['timestamp'],
+                    'name': html_escape(latestbuild['fullDisplayName']),
+                    'duration': duration,
+                    'status': (latestbuild['building'] and 'RUNNING' or latestbuild['result']),
+                    'url': latestbuild['url']
+                }
 
-                print('Job: %s' % jobname)
-                print('Is running build: %s' % ('yes' if job.is_running() else 'no'))
-                builds = job.get_build_ids()
+            count = 0
+            latestbuilds = []
+            for timestamp in sorted(jobs, reverse=True):
+                latestbuilds.append(jobs[timestamp])
+                count = count + 1
+                if count > CONFIG['buildcount']:
+                    break;
 
-                bcount = 0
-                for bid in builds:
-                    bcount += 1
-                    if bcount > 10:
-                        break
-
-                    build = job.get_build(bid)
-
-                    name = build.name.split(' ')
-                    namestr = name[0]
-                    if len(name) > 2:
-                        namestr = name[2]
-
-                    if build.is_running():
-                        status = 'RUNNING'
-                    else:
-                        status = build.get_status()
-
-                    duration = str(build.get_duration()).split('.')[0]
-
-                    data = {}
-                    data['id'] = jobname+'_'+str(bid)
-                    data['starttime'] = str(build.get_timestamp())
-                    data['sort'] = data['starttime'] + '_' + data['id']
-                    data['name'] = namestr
-                    data['status'] = status
-                    data['duration'] = duration
-                    data['href'] = build.get_result_url()
-
-                    # If this build is running, note queue length
-                    if status == 'RUNNING':
-                        data['queue'] = queue
-
-                    print(data)
-
-                    builddata.append(data)
-
-            dashboard_push_data('jenkins', builddata, True)
+            # push, push push!
+            dashboard_push_data('jenkins', {'builds': latestbuilds, 'queue': {'count': len(queue), 'items': queue}})
 
         except Exception as e:
             print 'Exceptional exception!'
@@ -155,3 +108,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
