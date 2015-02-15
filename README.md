@@ -1,3 +1,8 @@
+# To contribute
+
+Please submit a pull request!
+
+
 # Prerequisites
 
 * Tornado (http://www.tornadoweb.org) is installed - this can by done via easy_install
