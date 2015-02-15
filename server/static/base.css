@@ -68,6 +68,10 @@ div.plugin {
     background-color: #232526;
 }
 
+div.plugin:hover {
+    overflow: auto;
+}
+
 .dashboard-fullscreen div.plugin {
     height: 100%;
     width: 100%;
